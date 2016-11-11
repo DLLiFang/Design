@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_files"
+            android:icon="@mipmap/ic_attachment_black_24dp"
+            android:title="课程资源" />
+        <item
+            android:id="@+id/nav_bbs"
+            android:icon="@mipmap/ic_textsms_black_24dp"
+            android:title="BBS" />
+        <item
+            android:id="@+id/nav_follows"
+            android:icon="@mipmap/ic_people_black_24dp"
+            android:title="关注的人" />
+        <item
+            android:id="@+id/nav_template"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Tools" />
+    </group>
+    <item android:title="课堂">
+        <menu>
+            <item
+                android:id="@+id/nav_qr_code"
+                android:icon="@mipmap/ic_assignment_black_24dp"
+                android:title="二维码签到" />
+            <item
+                android:id="@+id/nav_shake"
+                android:icon="@mipmap/ic_vibration_black_24dp"
+                android:title="摇一摇点名" />
+        </menu>
+    </item>
+
+</menu>
