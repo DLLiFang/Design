@@ -83,6 +83,8 @@ public class FollowedFragment extends BaseFragment implements SwipeRefreshLayout
     @Override
     public void onItemClick(User bean) {
         //LToast.show(getContext(), "itemClicked");
-        startActivity(new Intent(getContext(), ProfileActivity.class));
+        //startActivity(new Intent(getContext(), ProfileActivity.class));
+        new MaterialDialog.Builder(getContext())
+                .items("取消关注(或跳转到个人页)").build().show();
     }
 }
