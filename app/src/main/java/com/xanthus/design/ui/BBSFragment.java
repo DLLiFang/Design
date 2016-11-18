@@ -1,5 +1,6 @@
 package com.xanthus.design.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.xanthus.design.R;
 import com.xanthus.design.adapter.BBSAdapter;
 import com.xanthus.design.adapter.ItemClickCallback;
@@ -24,7 +26,7 @@ import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 
-public class BBSFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener, ItemClickCallback<Topic> {
+public class BBSFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener, ItemClickCallback<Topic>, View.OnClickListener {
     public static final String TAG = "BBSFragment";
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout swipeRefresh;
@@ -70,6 +72,7 @@ public class BBSFragment extends BaseFragment implements SwipeRefreshLayout.OnRe
         mAdapter = new BBSAdapter(getContext());
         mAdapter.setItemClickCallback(this);
         mRecyclerView.setAdapter(mAdapter);
+        layout.findViewById(R.id.fab_bbs).setOnClickListener(this);
         initData();
     }
 
@@ -98,5 +101,15 @@ public class BBSFragment extends BaseFragment implements SwipeRefreshLayout.OnRe
     @Override
     public void onItemClick(Topic bean) {
         LToast.show(getContext(), "点击了条目,需跳转至评论列表页");// TODO: 16/11/10 跳转,附带id
+    }
+
+    @Override
+    public void onClick(View v) {
+switch (v.getId()){
+    case R.id.fab_bbs:
+
+        startActivity(new Intent(getContext(),AddTopicActivity.class));
+        break;
+}
     }
 }

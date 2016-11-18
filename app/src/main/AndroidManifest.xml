@@ -46,7 +46,9 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.LoginActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:label="@string/title_activity_login" />
+        <activity android:name=".ui.RegistActivity" />
+        <activity android:name=".ui.AddTopicActivity"></activity>
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.xanthus.design.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -7,13 +8,19 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.xanthus.design.R;
-import com.xanthus.design.utils.LToast;
+import com.xanthus.design.api.LSubscriber;
+import com.xanthus.design.api.LApi;
+import com.xanthus.design.bean.User;
+import com.xanthus.design.bean.Wrapper;
+import com.xanthus.design.utils.SPHelper;
+
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * A login screen that offers login via username/password.
@@ -25,11 +32,13 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
     private EditText mEmailView;
     private EditText mPasswordView;
     private View mLoginFormView;
+    private CompositeSubscription compositeSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        compositeSubscription = new CompositeSubscription();
         // Set up the login form.
         mEmailView = (EditText) findViewById(R.id.email);
 
@@ -48,6 +57,12 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
         mEmailSignInButton.setOnClickListener(this);
         findViewById(R.id.login_register).setOnClickListener(this);
         mLoginFormView = findViewById(R.id.login_form);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        compositeSubscription.unsubscribe();
     }
 
     /**
@@ -69,20 +84,14 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError("用户名密码错误");
-            focusView = mPasswordView;
-            cancel = true;
-        }
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError("请输入用户名");
             focusView = mEmailView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError("用户名格式不正确");
+        } else if (TextUtils.isEmpty(password)) {
+            mEmailView.setError("请输入密码");
             focusView = mEmailView;
             cancel = true;
         }
@@ -92,20 +101,19 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-
+            Subscription subscribe = LApi.INSTANCE.login(email, password).subscribe(new LSubscriber<Wrapper<User>>() {
+                @Override
+                public void onNext(Wrapper<User> wrapper) {
+                    User user = wrapper.getResult();
+                    if (user != null) {
+                        String s = user.getId() + ":" + user.getToken();
+                        SPHelper.saveToken(LoginActivity.this,s);
+                        LApi.INSTANCE.update(LoginActivity.this);
+                    }
+                }
+            });
+            compositeSubscription.add(subscribe);
         }
-    }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
     }
 
 
@@ -113,7 +121,7 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.login_register:
-                LToast.show(this,"哦啦啦~~");
+                startActivity(new Intent(this, RegistActivity.class));
                 break;
             case R.id.email_sign_in_button:
                 attemptLogin();
