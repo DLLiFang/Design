@@ -20,6 +20,7 @@ import com.xanthus.design.api.LSubscriber;
 import com.xanthus.design.api.LApi;
 import com.xanthus.design.bean.User;
 import com.xanthus.design.bean.Wrapper;
+import com.xanthus.design.utils.LToast;
 import com.xanthus.design.utils.SPHelper;
 
 import rx.Subscription;
@@ -121,9 +122,11 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
                         SPHelper.saveProfile(LoginActivity.this, user);
                         String s = user.getId() + ":" + user.getToken();
                         SPHelper.saveToken(LoginActivity.this, s);
-                        //LApi.INSTANCE.update(LoginActivity.this);
+                        LApi.INSTANCE.update();
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         finish();
+                    }else {
+                        LToast.show(LoginActivity.this,wrapper.getMessage());
                     }
                 }
             });

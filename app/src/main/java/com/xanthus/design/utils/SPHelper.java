@@ -20,7 +20,7 @@ public class SPHelper {
         SharedPreferences sp = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor edit = sp.edit();
         edit.putString(k, v);
-        edit.commit();
+        edit.apply();
     }
 
     public static String getString(Context context, String k) {
@@ -37,6 +37,7 @@ public class SPHelper {
 
     public static String getTokenToken(Context context) {
         if (TextUtils.isEmpty(tokenStr)) {
+            if (context==null)return "";
             tokenStr = getString(context, TOKEN_KEY);
         }
         return tokenStr;

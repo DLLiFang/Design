@@ -2,14 +2,18 @@ package com.xanthus.design.presenter;
 
 import com.xanthus.design.api.LApi;
 import com.xanthus.design.api.LSubscriber;
+import com.xanthus.design.bean.FileBean;
 import com.xanthus.design.bean.User;
 import com.xanthus.design.bean.Wrapper;
 import com.xanthus.design.constract.FileConstract;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Subscription;
@@ -58,12 +62,18 @@ public class FilePresenter implements FileConstract.FilePresenter {
 
     @Override
     public void uploadFile(final String path) {
+        final File file = new File(path);
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/otcet-stream"), file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("avatar", file.getName(), requestFile);
+        String descriptionString = "This is a description.";
+        RequestBody description = RequestBody.create(MediaType.parse("multipart/form-data"), descriptionString);
 
-        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), new File(path));
 
-        Subscription subscribe1 = LApi.INSTANCE.upload(requestBody).subscribe(new LSubscriber<Wrapper<User>>() {
+        Subscription subscribe1 = LApi.INSTANCE.upload(description,body).subscribe(new LSubscriber<Wrapper<FileBean>>() {
             @Override
-            public void onNext(Wrapper<User> userWrapper) {
+            public void onNext(Wrapper<FileBean> userWrapper) {
+                FileBean result = userWrapper.getResult();
+
                 mView.showToast(userWrapper.getMessage());
             }
         });

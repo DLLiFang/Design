@@ -1,10 +1,12 @@
 package com.xanthus.design.api;
 
+import com.xanthus.design.bean.FileBean;
 import com.xanthus.design.bean.Topic;
 import com.xanthus.design.bean.User;
 import com.xanthus.design.bean.Wrapper;
 import com.xanthus.design.bean.Wrapper2;
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -52,7 +54,7 @@ public interface LService {
 
     @Multipart
     @POST("file/")
-    Observable<Wrapper<User>> uploadFile(@Part("avatar") RequestBody file);
+    Observable<Wrapper<FileBean>> uploadFile(@Part("description") RequestBody descript, @Part MultipartBody.Part file);
 
 
 }

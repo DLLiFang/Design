@@ -3,6 +3,7 @@ package com.xanthus.design.api;
 import android.content.Context;
 
 import com.xanthus.design.DesignApp;
+import com.xanthus.design.bean.FileBean;
 import com.xanthus.design.bean.Topic;
 import com.xanthus.design.bean.User;
 import com.xanthus.design.bean.Wrapper;
@@ -12,6 +13,7 @@ import com.xanthus.design.utils.SPHelper;
 import java.io.IOException;
 
 import okhttp3.Interceptor;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -33,6 +35,10 @@ public enum LApi {
     private LService lService;
 
     LApi() {
+       update();
+    }
+
+    public void update() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.DOMAIN)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -41,16 +47,6 @@ public enum LApi {
                 .build();
         lService = retrofit.create(LService.class);
     }
-
-//    public void update(Context context) {
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(Constants.DOMAIN)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-//                .client(genericClient(context))
-//                .build();
-//        lService = retrofit.create(LService.class);
-//    }
 
     public Observable<Wrapper<User>> login(String uname, String pwd) {
         return lService
@@ -104,8 +100,8 @@ public enum LApi {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<Wrapper<User>> upload( RequestBody body) {
-        return lService.uploadFile( body)
+    public Observable<Wrapper<FileBean>> upload(RequestBody desc, MultipartBody.Part file) {
+        return lService.uploadFile(desc, file)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

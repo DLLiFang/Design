@@ -14,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +33,7 @@ import com.xanthus.design.ui.BBSFragment;
 import com.xanthus.design.ui.FileFragment;
 import com.xanthus.design.ui.FollowedFragment;
 import com.xanthus.design.ui.LoginActivity;
+import com.xanthus.design.ui.ProfileActivity;
 import com.xanthus.design.ui.ShakeActivity;
 import com.xanthus.design.utils.LToast;
 import com.xanthus.design.utils.SPHelper;
@@ -129,6 +131,7 @@ public class MainActivity extends AppCompatActivity
             exitBy2Click();
         }
     }
+
     private static boolean isExit = false;
 
     private void exitBy2Click() {
@@ -204,50 +207,21 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imageView:
-
-                break;
             case R.id.textView:
-
-                break;
             case R.id.nickname:
-                new MaterialDialog.Builder(this)
-                        .input("昵称", "", new MaterialDialog.InputCallback() {
-                            @Override
-                            public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                                if (input.length() == 0) {
-                                    LToast.show(MainActivity.this, "请输入昵称");
-                                    return;
-                                }
-                                setUserProfile(input.toString());
-                            }
-                        }).build().show();
+                startActivity(new Intent(this, ProfileActivity.class));
                 break;
         }
     }
 
-    private void setUserProfile(String nickname) {
-        Subscription subscribe = LApi.INSTANCE.modifyNickname(nickname).subscribe(new LSubscriber<Wrapper<User>>() {
-            @Override
-            public void onNext(Wrapper<User> userWrapper) {
-                if (userWrapper.getResult() != null) {
-                     userWrapper.getResult();
-                    SPHelper.saveProfile(MainActivity.this,userWrapper.getResult());
-                    LToast.show(MainActivity.this, "修改成功");
-                    bindData();
-                }else {
-                    LToast.show(MainActivity.this,userWrapper.getMessage());
-                    if (userWrapper.getResultCode()==2){
-                        SPHelper.saveToken(MainActivity.this,"");
-                    }
-                }
-            }
-        });
-        compositeSubscription.add(subscribe);
-    }
-
     private void bindData() {
         User profile = SPHelper.getProfile(this);
-        Glide.with(this).load(profile.getAvatar()).into(avatar);
+        String avatarURL = profile.getAvatar();
+        if (TextUtils.isEmpty(avatarURL)) {
+            avatar.setImageResource(R.mipmap.ic_launcher);
+        } else {
+            Glide.with(this).load(avatarURL).into(this.avatar);
+        }
         nicknaem.setText(profile.getNickname());
         account.setText(profile.getUsername());
     }

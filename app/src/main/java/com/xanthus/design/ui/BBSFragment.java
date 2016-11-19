@@ -111,7 +111,6 @@ public class BBSFragment extends BaseFragment implements SwipeRefreshLayout.OnRe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab_bbs:
-
                 startActivity(new Intent(getContext(), AddTopicActivity.class));
                 break;
         }
