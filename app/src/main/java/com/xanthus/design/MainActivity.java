@@ -2,6 +2,7 @@ package com.xanthus.design;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -13,10 +14,19 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.bumptech.glide.Glide;
+import com.xanthus.design.api.LApi;
+import com.xanthus.design.api.LSubscriber;
+import com.xanthus.design.bean.User;
+import com.xanthus.design.bean.Wrapper;
 import com.xanthus.design.ui.AttendanceActivity;
 import com.xanthus.design.ui.BBSFragment;
 import com.xanthus.design.ui.FileFragment;
@@ -24,14 +34,24 @@ import com.xanthus.design.ui.FollowedFragment;
 import com.xanthus.design.ui.LoginActivity;
 import com.xanthus.design.ui.ShakeActivity;
 import com.xanthus.design.utils.LToast;
+import com.xanthus.design.utils.SPHelper;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cn.qqtheme.framework.picker.FilePicker;
 import cn.qqtheme.framework.util.StorageUtils;
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
     private FragmentManager fm;
     private Fragment cacheFragment;
+    private ImageView avatar;
+    private TextView account;
+    private TextView nicknaem;
+    private CompositeSubscription compositeSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +60,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         fm = getSupportFragmentManager();
-
+        compositeSubscription = new CompositeSubscription();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -49,13 +69,21 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        avatar = ((ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView));
+        account = ((TextView) navigationView.getHeaderView(0).findViewById(R.id.textView));
+        nicknaem = ((TextView) navigationView.getHeaderView(0).findViewById(R.id.nickname));
+        avatar.setOnClickListener(this);
+        account.setOnClickListener(this);
+        nicknaem.setOnClickListener(this);
 
 
         cacheFragment = FileFragment.newInstance(null, null);
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.main_fragment_container, cacheFragment, FileFragment.TAG);
         transaction.commit();
+        bindData();
     }
+
 
     private void changeFragment(String tag) {
         Fragment temp = fm.findFragmentByTag(tag);
@@ -85,6 +113,12 @@ public class MainActivity extends AppCompatActivity
         cacheFragment = temp;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (compositeSubscription != null)
+            compositeSubscription.unsubscribe();
+    }
 
     @Override
     public void onBackPressed() {
@@ -92,7 +126,27 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            exitBy2Click();
+        }
+    }
+    private static boolean isExit = false;
+
+    private void exitBy2Click() {
+        Timer timer;
+        if (!isExit) {
+            isExit = true;
+            LToast.show(this, "再按一次退出程序");
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    isExit = false; // 取消退出
+                }
+            }, 2000); // 如果2秒钟内没有按下返回键，则启动定时器取消掉刚才执行的任务
+        } else {
+            //MobclickAgent.onKillProcess(this);
+            //System.exit(0);
+            finish();
         }
     }
 
@@ -145,4 +199,57 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.imageView:
+
+                break;
+            case R.id.textView:
+
+                break;
+            case R.id.nickname:
+                new MaterialDialog.Builder(this)
+                        .input("昵称", "", new MaterialDialog.InputCallback() {
+                            @Override
+                            public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                                if (input.length() == 0) {
+                                    LToast.show(MainActivity.this, "请输入昵称");
+                                    return;
+                                }
+                                setUserProfile(input.toString());
+                            }
+                        }).build().show();
+                break;
+        }
+    }
+
+    private void setUserProfile(String nickname) {
+        Subscription subscribe = LApi.INSTANCE.modifyNickname(nickname).subscribe(new LSubscriber<Wrapper<User>>() {
+            @Override
+            public void onNext(Wrapper<User> userWrapper) {
+                if (userWrapper.getResult() != null) {
+                     userWrapper.getResult();
+                    SPHelper.saveProfile(MainActivity.this,userWrapper.getResult());
+                    LToast.show(MainActivity.this, "修改成功");
+                    bindData();
+                }else {
+                    LToast.show(MainActivity.this,userWrapper.getMessage());
+                    if (userWrapper.getResultCode()==2){
+                        SPHelper.saveToken(MainActivity.this,"");
+                    }
+                }
+            }
+        });
+        compositeSubscription.add(subscribe);
+    }
+
+    private void bindData() {
+        User profile = SPHelper.getProfile(this);
+        Glide.with(this).load(profile.getAvatar()).into(avatar);
+        nicknaem.setText(profile.getNickname());
+        account.setText(profile.getUsername());
+    }
+
 }

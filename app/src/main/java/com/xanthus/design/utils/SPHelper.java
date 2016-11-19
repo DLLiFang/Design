@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+import com.xanthus.design.bean.User;
+
 /**
  * Created by liyiheng on 2016/11/18.
  */
@@ -37,5 +40,24 @@ public class SPHelper {
             tokenStr = getString(context, TOKEN_KEY);
         }
         return tokenStr;
+    }
+
+    private static User _user;
+
+    public static void saveProfile(Context context, User user) {
+        _user = user;
+        String s = new Gson().toJson(user, User.class);
+        putString(context, "profile", s);
+    }
+
+    public static User getProfile(Context context) {
+        if (_user == null) {
+            String profile = getString(context, "profile");
+            _user = new Gson().fromJson(profile, User.class);
+        }
+        if (_user == null) {
+            _user = new User();
+        }
+        return _user;
     }
 }

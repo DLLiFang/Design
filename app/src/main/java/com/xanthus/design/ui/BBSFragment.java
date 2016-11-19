@@ -13,7 +13,10 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.xanthus.design.R;
 import com.xanthus.design.adapter.BBSAdapter;
 import com.xanthus.design.adapter.ItemClickCallback;
+import com.xanthus.design.api.LApi;
+import com.xanthus.design.api.LSubscriber;
 import com.xanthus.design.bean.Topic;
+import com.xanthus.design.bean.Wrapper2;
 import com.xanthus.design.utils.LToast;
 
 import java.util.concurrent.TimeUnit;
@@ -83,19 +86,20 @@ public class BBSFragment extends BaseFragment implements SwipeRefreshLayout.OnRe
     }
 
     private void initData() {
-        Subscription subscribe = Observable.timer(1, TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Long>() {
-                    @Override
-                    public void call(Long aLong) {
-                        swipeRefresh.setRefreshing(false);
-                        mAdapter.updateRes(null);//// TODO: 16/11/10
-                    }
-                });
+        Subscription subscribe = LApi.INSTANCE.getTopics(0, 20).subscribe(new LSubscriber<Wrapper2<Topic>>() {
+            @Override
+            public void onNext(Wrapper2<Topic> topicWrapper2) {
+                swipeRefresh.setRefreshing(false);
+                mAdapter.updateRes(topicWrapper2.getResult());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                super.onError(e);
+                swipeRefresh.setRefreshing(false);
+            }
+        });
         compositeSubscription.add(subscribe);
-
-
     }
 
     @Override
@@ -105,11 +109,11 @@ public class BBSFragment extends BaseFragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onClick(View v) {
-switch (v.getId()){
-    case R.id.fab_bbs:
+        switch (v.getId()) {
+            case R.id.fab_bbs:
 
-        startActivity(new Intent(getContext(),AddTopicActivity.class));
-        break;
-}
+                startActivity(new Intent(getContext(), AddTopicActivity.class));
+                break;
+        }
     }
 }

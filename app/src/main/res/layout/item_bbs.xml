@@ -9,40 +9,41 @@
     android:padding="8dp">
 
     <ImageView
-        android:id="@+id/t___avatar"
+        android:id="@+id/item_bbs_avatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_launcher" />
 
     <TextView
-        android:id="@+id/t___nickname"
+        android:id="@+id/item_bbs_nickname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:layout_toEndOf="@id/t___avatar"
+        android:layout_toEndOf="@id/item_bbs_avatar"
         android:text="昵称"
         android:textSize="15sp"
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/item_bbs_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:text="2016-11-11 11:11" />
 
     <TextView
-        android:id="@+id/t___content"
+        android:id="@+id/item_bbs_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/t___nickname"
-        android:layout_toEndOf="@id/t___avatar"
+        android:layout_below="@id/item_bbs_nickname"
+        android:layout_toEndOf="@id/item_bbs_avatar"
         android:text="sakjdfjsgadfjhassdfasdfasdfgdfjhasdfjhgasdjhfghjsagfsadfasfdsadfsadfsdafhjdgasjhdfgaskjhdfg" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_below="@id/t___content"
+        android:layout_below="@id/item_bbs_content"
         android:text="回复：20" />
 
 </RelativeLayout>

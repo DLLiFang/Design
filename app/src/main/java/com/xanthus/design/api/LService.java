@@ -1,11 +1,19 @@
 package com.xanthus.design.api;
 
+import com.xanthus.design.bean.Topic;
 import com.xanthus.design.bean.User;
 import com.xanthus.design.bean.Wrapper;
+import com.xanthus.design.bean.Wrapper2;
 
+import okhttp3.RequestBody;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Part;
+import retrofit2.http.Query;
 import rx.Observable;
 
 /**
@@ -24,4 +32,27 @@ public interface LService {
     @FormUrlEncoded
     @POST("topic/")
     Observable<Wrapper<Long>> addTopic(@Field("content") String content);
+
+
+    @FormUrlEncoded
+    @PUT("user/")
+    Observable<Wrapper<User>> modifyNickname(@Field("nickname") String nickname);
+
+    @FormUrlEncoded
+    @PUT("user/")
+    Observable<Wrapper<User>> modifyPhone(@Field("phone") String phone);
+
+    @FormUrlEncoded
+    @PUT("user/")
+    Observable<Wrapper<User>> modifyGender(@Field("gender") int gender);//"1 male，2 female"
+
+    @GET("topic")
+    Observable<Wrapper2<Topic>> getTopicList(@Query("page") int page, @Query("pageSize") int pageSize);
+
+
+    @Multipart
+    @POST("file/")
+    Observable<Wrapper<User>> uploadFile(@Part("avatar") RequestBody file);
+
+
 }

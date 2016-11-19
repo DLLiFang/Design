@@ -1,9 +1,16 @@
 package com.xanthus.design.presenter;
 
+import com.xanthus.design.api.LApi;
+import com.xanthus.design.api.LSubscriber;
+import com.xanthus.design.bean.User;
+import com.xanthus.design.bean.Wrapper;
 import com.xanthus.design.constract.FileConstract;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -51,15 +58,16 @@ public class FilePresenter implements FileConstract.FilePresenter {
 
     @Override
     public void uploadFile(final String path) {
-        Subscription subscribe = Observable.timer(1, TimeUnit.SECONDS)//todo http Request
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Long>() {
-                    @Override
-                    public void call(Long aLong) {
-                        mView.showToast(path);
-                    }
-                });
-        compositeSubscription.add(subscribe);
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), new File(path));
+
+        Subscription subscribe1 = LApi.INSTANCE.upload(requestBody).subscribe(new LSubscriber<Wrapper<User>>() {
+            @Override
+            public void onNext(Wrapper<User> userWrapper) {
+                mView.showToast(userWrapper.getMessage());
+            }
+        });
+        compositeSubscription.add(subscribe1);
+
     }
 }

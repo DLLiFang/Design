@@ -2,8 +2,11 @@ package com.xanthus.design.api;
 
 import android.content.Context;
 
+import com.xanthus.design.DesignApp;
+import com.xanthus.design.bean.Topic;
 import com.xanthus.design.bean.User;
 import com.xanthus.design.bean.Wrapper;
+import com.xanthus.design.bean.Wrapper2;
 import com.xanthus.design.utils.SPHelper;
 
 import java.io.IOException;
@@ -11,6 +14,7 @@ import java.io.IOException;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -30,23 +34,23 @@ public enum LApi {
 
     LApi() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.123.232:8080/v1/")
+                .baseUrl(Constants.DOMAIN)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                //.client(genericClient())
+                .client(genericClient())
                 .build();
         lService = retrofit.create(LService.class);
     }
 
-    public void update(Context context) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.123.232:8080/v1/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .client(genericClient(context))
-                .build();
-        lService = retrofit.create(LService.class);
-    }
+//    public void update(Context context) {
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl(Constants.DOMAIN)
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+//                .client(genericClient(context))
+//                .build();
+//        lService = retrofit.create(LService.class);
+//    }
 
     public Observable<Wrapper<User>> login(String uname, String pwd) {
         return lService
@@ -62,6 +66,31 @@ public enum LApi {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    public Observable<Wrapper<User>> modifyNickname(String nickname) {
+        return lService
+                .modifyNickname(nickname)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<Wrapper<User>> modifyPhone(String phone) {
+        return lService
+                .modifyPhone(phone)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    /**
+     * @param gender 1.male 2.female
+     * @return
+     */
+    public Observable<Wrapper<User>> modifyGender(int gender) {
+        return lService
+                .modifyGender(gender)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
     public Observable<Wrapper<Long>> addTopic(String content) {
         return lService
                 .addTopic(content)
@@ -69,7 +98,19 @@ public enum LApi {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private OkHttpClient genericClient(final Context context) {
+    public Observable<Wrapper2<Topic>> getTopics(int page, int pageSize) {
+        return lService.getTopicList(page, pageSize)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<Wrapper<User>> upload( RequestBody body) {
+        return lService.uploadFile( body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private OkHttpClient genericClient() {
         OkHttpClient httpClient = new OkHttpClient.Builder()
                 .addInterceptor(new Interceptor() {
                     @Override
@@ -80,8 +121,8 @@ public enum LApi {
                                 .addHeader("Accept-Encoding", "gzip, deflate")
                                 .addHeader("Connection", "keep-alive")
                                 .addHeader("Accept", "*/*")
-                                .addHeader("Cookie", "add cookies here")
-                                .addHeader("auth", SPHelper.getTokenToken(context))
+                                //.addHeader("Cookie", "add cookies here")
+                                .addHeader("auth", SPHelper.getTokenToken(DesignApp.app))
                                 .build();
                         return chain.proceed(request);
                     }
@@ -91,4 +132,5 @@ public enum LApi {
 
         return httpClient;
     }
+
 }

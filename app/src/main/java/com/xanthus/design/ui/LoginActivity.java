@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,6 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.xanthus.design.DesignApp;
+import com.xanthus.design.MainActivity;
 import com.xanthus.design.R;
 import com.xanthus.design.api.LSubscriber;
 import com.xanthus.design.api.LApi;
@@ -38,6 +41,14 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        String token = SPHelper.getTokenToken(this);
+        Log.e("Login", "token:" + token + ":");
+
+        if (!TextUtils.isEmpty(token)) {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return;
+        }
         compositeSubscription = new CompositeSubscription();
         // Set up the login form.
         mEmailView = (EditText) findViewById(R.id.email);
@@ -57,12 +68,13 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
         mEmailSignInButton.setOnClickListener(this);
         findViewById(R.id.login_register).setOnClickListener(this);
         mLoginFormView = findViewById(R.id.login_form);
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        compositeSubscription.unsubscribe();
+        if (compositeSubscription != null) compositeSubscription.unsubscribe();
     }
 
     /**
@@ -106,9 +118,12 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
                 public void onNext(Wrapper<User> wrapper) {
                     User user = wrapper.getResult();
                     if (user != null) {
+                        SPHelper.saveProfile(LoginActivity.this, user);
                         String s = user.getId() + ":" + user.getToken();
-                        SPHelper.saveToken(LoginActivity.this,s);
-                        LApi.INSTANCE.update(LoginActivity.this);
+                        SPHelper.saveToken(LoginActivity.this, s);
+                        //LApi.INSTANCE.update(LoginActivity.this);
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
                     }
                 }
             });
