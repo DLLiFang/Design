@@ -57,7 +57,7 @@ public class FileListAdapter
         holder.itemView.setOnClickListener(this);
 
         holder.fileName.setText(fileBean.getName());
-        String date = simpleDateFormat.format(new Date(fileBean.getCreatetime()*1000));
+        String date = simpleDateFormat.format(new Date(fileBean.getCreatetime()*1000 ));
         User user = fileBean.getUser();
         String nick = "";
         if (user != null) {
