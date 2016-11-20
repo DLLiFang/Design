@@ -16,29 +16,27 @@
 
 
     <TextView
-        android:maxWidth="150dp"
-        android:lines="1"
-        android:ellipsize="middle"
+        android:id="@+id/item_file_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:ellipsize="middle"
+        android:lines="1"
+        android:maxWidth="150dp"
         android:text="文件名.doc"
         android:textColor="@color/colorPrimary" />
 
     <TextView
+        android:id="@+id/item_file_timeAndUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:text="xxx上传于2016-11-11" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:text="250kb" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:text="下载量:66" />
+        android:text="下载量:66"
+        android:visibility="gone" />
 </android.support.v7.widget.CardView>

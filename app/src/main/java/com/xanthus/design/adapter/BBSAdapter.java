@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.xanthus.design.R;
+import com.xanthus.design.api.LConstants;
 import com.xanthus.design.bean.Topic;
 
 import java.text.SimpleDateFormat;
@@ -23,6 +25,7 @@ import java.util.List;
 public class BBSAdapter extends RecyclerView.Adapter<BBSAdapter.BBSHolder> implements AdapterInterf<Topic>, View.OnClickListener {
     private final SimpleDateFormat simpleDateFormat;
     private LayoutInflater mInflater;
+    private Context context;
     private ItemClickCallback<Topic> itemClickCallback;
 
     public void setItemClickCallback(ItemClickCallback<Topic> itemClickCallback) {
@@ -31,6 +34,7 @@ public class BBSAdapter extends RecyclerView.Adapter<BBSAdapter.BBSHolder> imple
 
     public BBSAdapter(Context context) {
         mData = new ArrayList<>();
+        this.context = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
@@ -61,7 +65,9 @@ public class BBSAdapter extends RecyclerView.Adapter<BBSAdapter.BBSHolder> imple
         holder.itemView.setOnClickListener(this);
         holder.nickname.setText(topic.getUser().getNickname());
         holder.content.setText(topic.getContent());
-        holder.time.setText(simpleDateFormat.format(new Date(topic.getCreatetime()*1000)));
+        holder.time.setText(simpleDateFormat.format(new Date(topic.getCreatetime() * 1000)));
+
+        Glide.with(context).load(LConstants.FILE_PRE + topic.getUser().getAvatar()).into(holder.avatar);
     }
 
     @Override

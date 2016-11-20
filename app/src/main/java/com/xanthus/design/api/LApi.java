@@ -1,7 +1,5 @@
 package com.xanthus.design.api;
 
-import android.content.Context;
-
 import com.xanthus.design.DesignApp;
 import com.xanthus.design.bean.FileBean;
 import com.xanthus.design.bean.Topic;
@@ -40,7 +38,7 @@ public enum LApi {
 
     public void update() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.DOMAIN)
+                .baseUrl(LConstants.DOMAIN)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(genericClient())
@@ -100,8 +98,19 @@ public enum LApi {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<Wrapper<FileBean>> upload(RequestBody desc, MultipartBody.Part file) {
-        return lService.uploadFile(desc, file)
+    public Observable<Wrapper2<FileBean>> getFiles(int page, int pageSize) {
+        return lService.getFileList(page, pageSize)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    /**
+     *
+     * @param type 0.common files; 1. avatar
+     * @return
+     */
+    public Observable<Wrapper<FileBean>> upload(RequestBody desc, MultipartBody.Part file,int type) {
+        return lService.uploadFile(desc, file,type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

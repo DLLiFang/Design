@@ -8,10 +8,11 @@
     tools:context="com.xanthus.design.ui.ProfileActivity">
 
     <ImageView
-        android:layout_margin="30dp"
+
         android:id="@+id/profile_avatar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="30dp"
         android:src="@mipmap/ic_launcher" />
 
     <TextView
@@ -32,11 +33,11 @@
         android:text="username" />
 
     <TextView
-        android:padding="5dp"
-        android:textSize="18sp"
         android:id="@+id/profile_gender"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="gender" />
+        android:padding="5dp"
+        android:text="gender"
+        android:textSize="18sp" />
 
 </LinearLayout>

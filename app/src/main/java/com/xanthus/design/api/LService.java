@@ -54,7 +54,12 @@ public interface LService {
 
     @Multipart
     @POST("file/")
-    Observable<Wrapper<FileBean>> uploadFile(@Part("description") RequestBody descript, @Part MultipartBody.Part file);
+    Observable<Wrapper<FileBean>> uploadFile(@Part("description") RequestBody descript,
+                                             @Part MultipartBody.Part file,
+                                             @Part("type") int type);//0. common 1.avatar
+
+    @GET("file/list/")
+    Observable<Wrapper2<FileBean>> getFileList(@Query("page") int page, @Query("pageSize") int pageSize);
 
 
 }

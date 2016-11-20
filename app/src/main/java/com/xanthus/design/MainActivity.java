@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.xanthus.design.api.LApi;
+import com.xanthus.design.api.LConstants;
 import com.xanthus.design.api.LSubscriber;
 import com.xanthus.design.bean.User;
 import com.xanthus.design.bean.Wrapper;
@@ -220,7 +221,7 @@ public class MainActivity extends AppCompatActivity
         if (TextUtils.isEmpty(avatarURL)) {
             avatar.setImageResource(R.mipmap.ic_launcher);
         } else {
-            Glide.with(this).load(avatarURL).into(this.avatar);
+            Glide.with(this).load(LConstants.FILE_PRE + avatarURL).into(this.avatar);
         }
         nicknaem.setText(profile.getNickname());
         account.setText(profile.getUsername());
